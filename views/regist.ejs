@@ -1,0 +1,155 @@
+<html>
+<head>
+    <title>Login</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript">
+
+        /*$("#inputEmail3").blur(
+                $.get('/verify',{"name":document.getElementById("inputEmail3").value}, function (data,status) {
+                    alert(data.data);
+                })
+        );*/
+
+        window.onload=function() {
+            var name_label=document.getElementById("name_label");
+            var inputPassword3=document.getElementById("inputPassword3");
+            var ps_label=document.getElementById("ps_label");
+            var inputPassword4=document.getElementById("inputPassword4");
+            var rps_label=document.getElementById("rps_label");
+            var exampleInputEmail1=document.getElementById("exampleInputEmail1");
+            var email_label=document.getElementById("email_label");
+            $("#inputEmail3").blur(
+
+                    function () {
+                        $.get('/verify',{"name":document.getElementById("inputEmail3").value}, function (data,status) {
+                            //alert(data.data);
+                            if(data.data.toString()=="用户名已存在"){
+                                name_label.innerHTML=data.data.toString();
+                                name_label.style.color="red";
+                            }else if(data.data.toString()=="用户名可用"){
+                                name_label.innerHTML=data.data.toString();
+                                name_label.style.color="green";
+                            }
+                        });
+                    }
+            );
+            $("#inputPassword3").blur(
+                    function () {
+                        var len=inputPassword3.value.length;
+                        if(len<6){
+                            ps_label.innerHTML="密码位数至少6位";
+                            ps_label.style.color="red";
+                        }else {
+                            ps_label.innerHTML="密码格式正确";
+                            ps_label.style.color="green";
+                        }
+                    }
+            );
+            $("#inputPassword4").blur(
+                    function () {
+                        if(inputPassword4.value!=inputPassword3.value){
+                            rps_label.innerHTML="两次密码不相同";
+                            rps_label.style.color="red";
+                        }else {
+                            rps_label.innerHTML="两次密码相同";
+                            rps_label.style.color="green";
+                        }
+                    }
+            );
+            var modu=/^(([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-]))/;
+            $("#exampleInputEmail1").blur(
+
+                function () {
+                    if (modu.test(exampleInputEmail1.value)){
+                        email_label.innerHTML="格式正确";
+                        email_label.style.color="green";
+                    }else{
+                        email_label.innerHTML="格式不正确";
+                        email_label.style.color="red";
+                    }
+                }
+            );
+
+        }
+        function registUser(){
+            var name=document.getElementById("inputEmail3").value;
+            var password=document.getElementById("inputPassword3").value;
+            var email=document.getElementById("exampleInputEmail1").value;
+            $.get('/RegistMail', {"name":name,"password":password,"email":email}, function (data,status) {
+                if(data.data=="success"){
+                    var r=confirm("注册成功，请登录邮箱激活并重新登陆");
+                    if(r==true){
+                        window.location.replace("/");
+                    }
+                }else{
+                    alert("注册失败，请重新注册！");
+                }
+            });
+        }
+        function regist(){
+            window.location.replace("/regist");
+        }
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">小游戏</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">首页 <span class="sr-only">(current)</span></a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+    <form class="form-horizontal" onsubmit="return false" action="#" method="get">
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">用户名：</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="inputEmail3" name="name" placeholder="Name">
+                <label id="name_label"></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label">密码：</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" id="inputPassword3" placeholder="Password" name="password">
+                <label id="ps_label"></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label">确认密码：</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" id="inputPassword4" placeholder="affirm Password" name="affirm_password">
+                <label id="rps_label"></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label">邮箱地址：</label>
+            <div class="col-sm-10">
+                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email@qq.com" name="email">
+                <label id="email_label"></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default" onclick="registUser()">注册</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+
+</body>
+
+
+</html>

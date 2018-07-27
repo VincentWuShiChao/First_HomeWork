@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>房间<%= number%></title>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript">
+        var ws = new WebSocket("ws://192.168.1.141:3000?number="+"<%= number%>");
+        var flag=true;
+        ws.onopen = function() {
+            console.log("连接状态", ws);
+            $("#show").html("连接状态;" + ws.readyState + "</br>");
+            ws.open("start");
+        };
+        var list=[];
+        ws.onmessage = function(evt) {
+            var obj_1=evt.data.split("@");
+            if(obj_1.length>1){
+                if(obj_1[2]=="<%= number%>"){
+                    var ms_list=obj_1[1].split(",");
+                    for(var i=0;i<ms_list.length;i++){
+                        $("#show").append(ms_list[i] + "</br>");
+                    }
+                }
+            }else {
+                var obj = evt.data.split(":");//[name,msg,chatlist]
+                if (obj.length == 5) {
+                    if(obj[4]=="<%= number%>"){
+                        if (obj[1] == "0") {
+                            list = [];
+                            for (var i = 0; i < obj[2].split(",").length; i++) {
+                                if (obj[2].split(",")[i] != "") {
+                                    list[i] = obj[2].split(",")[i];
+                                }
+                            }
+                            $("#count_number").html(obj[3]);
+                            $("#persons").html("");
+                            for (var j = 0; j < list.length; j++) {
+                                $("#persons").append(list[j] + "</br>");
+                            }
+                        } else if(obj[1]=="1"){
+                            $("#show").append(obj[0]+":"+"退出聊天室" + "</br>");
+                            list = [];
+                            for (var i = 0; i < obj[2].split(",").length; i++) {
+                                if (obj[2].split(",")[i] != "") {
+                                    list[i] = obj[2].split(",")[i];
+                                }
+                            }
+                            $("#count_number").html(obj[3]);
+                            $("#persons").html("");
+                            for (var j = 0; j < list.length; j++) {
+                                $("#persons").append(list[j] + "</br>");
+                            }
+                        }else {
+                            var name = $("#name").val();
+                            for(var i=0;i<list.length;i++){
+                                if(list[i]==name){
+                                    $("#show").append(obj[0]+":"+obj[1] + "</br>");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                } else if (obj.length == 2) {
+                    if(obj[1]=="<%= number%>"){
+                        if (obj[0] == "getname") {
+                            var str = "{name:'" + "<%= name %>" + "',roomid:" + "<%= number %>," + "msg:0" + "}";
+                            ws.send(str);
+                        }
+                    }
+                }
+            }
+        };
+        ws.onclose = function(evt) {
+            console.log("WebSocketClosed!");
+            console.log(evt);
+        };
+        ws.onerror = function(evt) {
+            console.log("WebSocketError!");
+        };
+        function send() {
+            var msg = $("#message").val();
+            //var key = $("#token").val();
+            var name = $("#name").val();
+            var str = "{name:'" + name + "',msg:'" + msg +  "'"+",roomid:"+"<%=number%>"+"}";
+            console.log("发送", str);
+            ws.send(str);
+        };
+        function exit() {
+            var r = ws.close();
+            var name = $("#name").val();
+            alert("退出房间");
+            window.location.replace("/into_chat?name="+name);
+        }
+    </script>
+</head>
+<style type="text/css" media="screen">
+    div {
+        border: 1px solid #cccccc;
+        width: 500px;
+        min-height: 100px;
+    }
+</style>
+
+<body>
+<div style="float:left;width: 400px;height:200px;margin-top: 200px;margin-left: 500px">
+    <div  style="width: 400px;height:200px; overflow-y:scroll;">
+        <div id="show">
+        </div>
+    </div>
+    <input type="text" id="message" name="mesage" value="" placeholder="发送信息">
+    <input type="text" id="name" value="<%= name%>" placeholder="昵称;">
+    <input type="button" id="send_button" onclick="send()" value="发送"/>
+    <input type="button" id="exit_button" onclick="exit()" value="退出"/>
+
+</div>
+<div style="float: left;width:150px;height: 240px;margin-top: 200px;">
+    在线人数：<div  style="width:150px;height:20px;" id="count_number"></div>
+    在线成员：<div style="width:150px;height:50px;overflow-y: scroll" id="persons">
+
+    </div>
+</div>
+</body>
+
+</html>

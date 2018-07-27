@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <title>Login</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script type="text/javascript">
+            function login(){
+                var name=document.getElementById("inputEmail3").value;
+                var password=document.getElementById("inputPassword3").value;
+                $.get('/Home',{"name":name,"password":password},function (data,status) {
+
+                    if(data.msg==1){
+                        var r=confirm("信息正确");
+                        if(r==true){
+                            window.location.replace("/HomeTo?name="+name);
+                        }
+                    }else {
+                        alert(data.msg);
+                    }
+                });
+            }
+            function regist(){
+                window.location.replace("/regist");
+            }
+            function forget(){
+                var name=document.getElementById("inputEmail3").value;
+                $.get('/forget',{"name":name}, function (data,status) {
+                    if(data.msg!=null){
+                        alert(data.msg);
+                    }else {
+                        var v=confirm("是否将密码发送到绑定的邮箱中?");
+                        if(v==true){
+                            $.get('/sendemail',{"email":data.email,"password":data.password}, function (data,status) {
+                                if(data.msg="1"){
+                                    alert("请到邮箱查看密码");
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        </script>
+    </head>
+    <body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">小游戏</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">首页 <span class="sr-only">(current)</span></a></li>
+                </ul>
+
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+    <div class="container">
+        <div class="form-group">
+            <img style="height: 200px;width:100%;" src="images/login.jpg"/>
+        </div>
+
+        <div class="form-group"></div>
+        <form class="form-horizontal" onsubmit="return false" action="##" method="get">
+            <div class="form-group">
+                <label for="inputEmail3" class="col-sm-2 control-label">用户名：</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="inputEmail3" name="name" placeholder="Name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">密码：</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="inputPassword3" placeholder="Password" name="password">
+                    <label id="err"></label>
+                </div>
+            </div>
+            <div class="form-group">
+
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="button" class="btn btn-default" onclick="login()">登录</button>
+                </div>
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default" onclick="regist()">注册</button>
+                </div>
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default" onclick="forget()">？忘记密码</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    </body>
+
+
+</html>
